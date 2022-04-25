@@ -32,40 +32,44 @@ const breakpoints: number[] = [
 ];
 
 const ColorResponsive = () => {
-    const [color, setColor] = useState('');
+  const [color, setColor] = useState("");
 
+  useEffect(() => {
     const alteraCor = () => {
-        const width = window.innerWidth;
-        console.log('width: ', window.innerWidth);
-        const index = breakpoints.findIndex(breakpoint => width <= breakpoint);
-        const breakpointIndex = index === -1 ? 0 : index;
-        setColor(colors[breakpointIndex]);
-        console.log('alteraCor()');
-    }
+      const width = window.innerWidth;
+      const index = breakpoints.findIndex((breakpoint) => width < breakpoint);
+      const breakpointIndex = index === -1 ? 0 : index;
+      setColor(colors[breakpointIndex]);
+    };
 
-    useEffect(() => {
-        alteraCor();
-        window.addEventListener('resize', alteraCor);
-        return () => {
-            window.removeEventListener('resize', alteraCor);
-        }
-    }, []);
+    alteraCor();
 
+    const debounce = (func: () => void, delay: number) => {
+      let timer: ReturnType<typeof setTimeout>;
+      return function () {
+        clearTimeout(timer);
+        timer = setTimeout(func, delay);
+      };
+    };
+    
+    window.addEventListener("resize", debounce(alteraCor, 500));
+    
+    return window.removeEventListener("resize", debounce(alteraCor, 500));
+  }, []);
 
-    console.log('=== render');
-
-    return (
-        <div className={
-            classNames(
-                color,
-                'flex items-center justify-center w-screen h-screen bg-'
-            )
-        }>
-            <p className='text-5xl text-white md:text-7xl lg:text-9xl'>
-                {color.replace('bg-', '').replace('-600', '')}
-            </p>
-        </div>
-    );
+  console.log("==== re-render");
+  return (
+    <div
+      className={classNames(
+        color,
+        "flex items-center justify-center w-screen h-screen bg-",
+      )}
+    >
+      <p className="text-5xl text-white md:text-7xl lg:text-9xl">
+        {color.replace('bg-', "").replace("-600", "")}
+      </p>
+    </div>
+  );
 };
 
 export default ColorResponsive;
